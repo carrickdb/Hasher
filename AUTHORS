@@ -1,0 +1,12 @@
+Vasily Tarasov (Stony Brook Univesity)
+Will Buik (Harvey Mudd College)
+Geoff Kuenning (Harvey Mudd College)
+Sonam Mandal (Stony Brook Univesity)
+Amar Mudrankit (Stony Brook University)
+Philip Shilane
+Sagar Trehan (Stony Brook University)
+Erez Zadok (Stony Brook University)
+
+rbtree.[ch] and list.h are borrowed from the Linux kernel sources.
+
+murmurhash.[ch] are borrowed from https://sites.google.com/site/murmurhash/.

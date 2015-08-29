@@ -1,0 +1,68 @@
+.\" Process this file with
+.\" groff -man -Tascii hf-simdex.1
+.\"
+.TH HF-SIMDEX 1 "February 2014" Linux "User Manuals"
+.LO 1
+
+.SH NAME
+hf-simdex \- calculates the number of duplicated chunks in the hash files.
+
+.SH SYNOPSIS
+
+.B hf-simdex
+.RB [ -i
+.IR indexing_method ]
+.RB [ -s
+.IR hash ]
+.I hash_files
+.B ...
+
+.SH DESCRIPTION
+.B hf-simdex
+indexes the hashes in one or several
+.I hash_files
+to calculate the number of 
+duplicated chunks. Notice,
+.B hf-simdex 
+does not verify that supplied
+.I hash_files
+use the same chunking and hashing methods.
+
+
+.SH OPTIONS
+.TP
+.B \-\^i indexing_method
+Determines the indexing method to use.
+Valid values are
+.IR rbtree
+and
+.IR list.
+Using
+.IIrbtree
+results in shorter run times (default).
+
+.TP
+.B \-\^s hash
+Instructs 
+.B fs-hasher
+to skip specified
+.IR hash .
+Use multiple times if you want to specify several hashes.
+
+.SH EXAMPLES
+# hf-simdex file.hash
+
+# hf-simdex -s 00:00:00:00:00:00:00:00 file.hash
+
+.SH AUTHORS
+File systems and Storage Lab (FSL) at Stony Brook University in collaboration
+with Harvey Mudd College (HMC) and Philip Shilane. Vasily Tarasov, Will Buik,
+Geoff Kuenning, Sonam Mandal, Amar Mudrankit, Philip Shilane, Sagar Trehan, and
+Erez Zadok. The package is maintained via
+.B <fsltraces@fsl.cs.sunysb.edu>
+mailing list.
+
+.SH "SEE ALSO"
+.BR fs-hasher (1),
+.BR hf-anonymizer (1),
+.BR hf-stat (1)

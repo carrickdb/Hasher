@@ -1,0 +1,423 @@
+.obtaining metadata of a current file\" Process this file with
+.\" groff -man -Tascii libhashfile.3
+.\"
+.TH LIBHASHFILE 3 "February 2014" Linux "User Manuals"
+.LO 1
+
+.SH NAME
+libhashfile \- library for reading and creating hash files.
+
+.SH SYNOPSIS
+
+#include <libhashfile.h>
+
+/*
+ * Functions for reading an existing hash file.
+ */
+
+.B struct hashfile_handle *hashfile_open(char
+.BI * hash_file_name );
+
+.B void hashfile_close(struct hashfile_handle
+.BI * hf_handle );
+
+/*
+ * Functions for reading the metadata of a hash file.
+ */
+
+.B uint32_t hashfile_version(struct hashfile_handle
+.BI * hf_handle );
+
+.B const char *hashfile_rootpath(struct hashfile_handle
+.BI * hf_handle );
+
+.B const char *hashfile_sysid(struct hashfile_handle
+.BI * hf_handle );
+
+.B uint64_t hashfile_start_time(struct hashfile_handle
+.BI * hf_handle );
+
+.B uint64_t hashfile_end_time(struct hashfile_handle
+.BI * hf_handle );
+
+.B uint64_t hashfile_numfiles(struct hashfile_handle
+.BI * hf_handle );
+
+.B uint64_t hashfile_numchunks(struct hashfile_handle
+.BI * hf_handle );
+
+.B uint64_t hashfile_numbytes(struct hashfile_handle
+.BI * hf_handle );
+
+.B uint32_t hashfile_hash_size(struct hashfile_handle
+.BI * hf_handle );
+
+.B enum chnking_method hashfile_chunking_method(struct hashfile_handle
+.BI * hf_handle );
+
+.B int hashfile_chunking_method_str(struct hashfile_handle
+.BI * hf_handle ,
+.B char
+.BI * method_str ,
+.B int
+.IB method_str_len );
+
+.B enum hshing_method hashfile_hashing_method(struct hashfile_handle
+.BI * hf_handle );
+
+.B int hashfile_hashing_method_str(struct hashfile_handle
+.BI * hf_handle ,
+.B char
+.BI * method_str ,
+.B int
+.IB  method_str_len );
+
+.B int hashfile_fxd_chunking_params(struct hashfile_handle
+.BI * hf_handle ,
+.B struct fixed_chnking_params
+.BI * params );
+
+.B int hashfile_var_chunking_params(struct hashfile_handle
+.BI * hf_handle ,
+.B struct var_chnking_params
+.BI * params );
+
+/*
+ * Functions for iterating over the files and chunks in a hash file.
+ */
+
+.B int hashfile_next_file(struct hashfile_handle
+.BI * hf_handle );
+
+.B const struct chunk_info *hashfile_next_chunk(struct hashfile_handle
+.BI * hf_handle );
+
+.B int hashfile_reset(struct hashfile_handle
+.BI * hf_handle );
+
+/*
+ * Functions for obtaining metadata of a current file in a hash file.
+ */
+
+.B const char *hashfile_curfile_path(struct hashfile_handle
+.BI * hf_handle );
+
+.B uint64_t hashfile_curfile_numchunks(struct hashfile_handle
+.BI * hf_handle );
+
+.B uint32_t hashfile_curfile_uid(struct hashfile_handle
+.BI * hf_handle );
+
+.B uint32_t hashfile_curfile_gid(struct hashfile_handle
+.BI * hf_handle );
+
+.B uint64_t hashfile_curfile_perm(struct hashfile_handle
+.BI * hf_handle );
+
+.B uint64_t hashfile_curfile_atime(struct hashfile_handle
+.BI * hf_handle );
+
+.B uint64_t hashfile_curfile_mtime(struct hashfile_handle
+.BI * hf_handle );
+
+.B uint64_t hashfile_curfile_ctime(struct hashfile_handle
+.BI * hf_handle );
+
+.B uint64_t hashfile_curfile_size(struct hashfile_handle
+.BI * hf_handle );
+
+.B uint64_t hashfile_curfile_hardlinks(struct hashfile_handle
+.BI * hf_handle );
+
+.B uint64_t hashfile_curfile_deviceid(struct hashfile_handle
+.BI * hf_handle );
+
+.B uint64_t hashfile_curfile_inodenum(struct hashfile_handle
+.BI * hf_handle );
+
+.B char *hashfile_curfile_linkpath(struct hashfile_handle
+.BI * hf_handle );
+
+.B uint64_t hashfile_curfile_blocks(struct hashfile_handle
+.BI * hf_handle );
+
+/*
+ * Functions for writing new hash files.
+ */
+
+.B struct hashfile_handle *hashfile_open4write(char
+.BI * hash_file_name ,
+.B enum chnking_method
+.IB chunking_method ,
+.B enum hshing_method
+.IB hashing_method ,
+.B uint32_t
+.IB hash_size ,
+.B const char
+.BI * fs_path );
+
+.B int hashfile_set_fxd_chnking_params(struct hashfile_handle
+.BI * hf_handle ,
+.B struct fixed_chnking_params
+.BI * params );
+
+.B int hashfile_set_var_chnking_params(struct hashfile_handle
+.BI * hf_handle ,
+.B struct var_chnking_params
+.BI * params );
+
+.B int hashfile_add_file(struct hashfile_handle
+.BI * hf_handle,
+.B const char
+.BI * file_path ,
+.B const struct stat
+.BI * stats ,
+.B const char
+.BI * target_path );
+
+.B int hashfile_add_chunk(struct hashfile_handle
+.BI * hf_handle  ,
+.B const struct chunk_info
+.BI * info );
+
+/*
+ * Relevant structures.
+ */
+
+.B enum chnking_method {
+.RS 3
+.br
+.B	FIXED
+= 1,
+.br
+.B	VARIABLE
+= 2
+.RE
+.br
+};
+
+.B enum hshing_method {
+.RS 3
+.br
+.B	MD5_HASH
+= 1,
+.br
+.B	SHA256_HASH
+= 2,
+.br
+.B	MD5_48BIT_HASH
+= 3,
+.br
+.B	MURMUR_HASH
+= 4,
+.br
+.B	MD5_64BIT_HASH
+= 5
+.RE
+.br
+};
+
+.B struct chunk_info {
+.RS 3
+.br
+.B	uint8_t *hash;
+/* points to static memory */
+.br
+.B	uint64_t size;
+.br
+.B	uint8_t cratio;
+/* in tenths */
+.RE
+.br
+.B };
+
+.SH DESCRIPTION
+
+.B libhashfile
+is a library for creating and reading hash files. 
+.B hashfile_open()
+function opens a hash file for reading. To create a new hash file
+.B hashfile_open4write()
+function should be used instead.  Both of these functions return a pointer to a
+.B hashfile_handle
+structure that is passed to all subsequent function calls.
+After completing all required actions with a hash file
+one should call
+.B hashfile_close()
+function.
+
+After opening an existing hash file, a group of the following functions can
+be used to access the metadata of the hash file.
+.B hashfile_version()
+returns the version of the hash file format.
+.B hashfile_rootpath()
+returns the null-terminated file system path that was scanned.
+.B hashfile_sysid()
+returns the null-terminated description of the machine that performed the scan.
+.B hashfile_start_time() 
+and
+.B hashfile_end_time()
+return the time when the scan started and ended in 
+seconds since 1970-01-01 00:00:00 +0000 (UTC).
+.BR hashfile_numfiles() ,
+.BR hashfile_numchunks() ,
+and
+.B hashfile_numbytes()
+return the number of files, chunks, and bytes scanned, respectively.
+.B hashfile_hash_size()
+returns the size of a hash in bits.
+.B hashfile_chunking_method()
+returns
+.B FIXED
+or
+.B VARIABLE
+constants designating what chunking method was used.
+.B hashfile_chunking_method_str()
+puts the textual description of a chunking method
+in
+.IR method_str .
+.B hashfile_hashing_method() 
+returns
+.BR  MD5_HASH ,
+.BR MD5_48BIT_HASH ,
+.BR SHA256_HASH ,
+or
+.B MURMUR_HASH
+constants designating the hashing method used.
+.B hashfile_hashing_method_str()
+puts the textual description of a hashing method in
+.IR method_str .
+.B hashfile_fxd_chunking_params()
+and
+.B hashfile_var_chunking_params()
+put fixed and variable chunking parameters in
+.I params
+structure, respectively. Consult
+.B <libhashfile.h>
+if you need more information on
+.B fixed_chnking_params
+and 
+.B var_chnking_params
+structures.
+
+
+To iterate over files within a hash file
+.B hashfile_next_file()
+function should be used.  It moves
+.BR libhashfile 's
+internal pointer to the next file in a hash file.
+After that, current file's metadata
+can be accessed via
+.B hashfile_curfile_*
+family of functions.
+.B hashfile_next_file()
+returns 0 if there are no more files in the hash file
+and a positive number otherwise.
+.B hashfile_curfile_path()
+returns the null-terminated path of the current file.
+.B hashfile_curfile_numchunks()
+returns the number of chunks in a file.
+.B hashfile_curfile_uid()
+and
+.B hashfile_curfile_gid()
+return the user and group IDs of the owner of the file, respectively.
+.B hashfile_curfile_perm()
+returns file permissions as per stat()
+system call.
+.BR hashfile_curfile_atime() ,
+.BR hashfile_curfile_mtime() ,
+and
+.B hashfile_curfile_ctime()
+return access, modification, and creation times as returned by
+.B stat()
+system call.
+.B hashfile_curfile_size()
+returns the size of the file in bytes.
+.B hashfile_curfile_hardlinks()
+returns the number of hardlinks.
+.B hashfile_curfile_deviceid()
+returns the device ID as per
+stat() system call.
+.B hashfile_curfile_inodenum()
+returns the inode number.
+If a file is a symlink then 
+.B hashfile_curfile_linkpath()
+returns null-terminated target path. Otherwise it returns NULL.
+.B hashfile_curfile_blocks()
+returns the number of 512-byte blocks allocated by the file system
+for this file.
+
+To iterate over chunks within a current file
+.B hashfile_next_chunk()
+function should be used. Information of about the
+current chunk is returned in
+.B chunk_info
+structure.
+.B cratio
+field is in tenths. E.g., 30 means 3.0.
+.B hashfile_next_chunk()
+returns NULL if there are no more chunks in a file.
+
+When creating a new hash file,
+.B hashfile_open4write()
+function allows to specify chunking and hashing methods,
+hash size, and file system path that will be scanned.
+.B hashfile_set_fxd_chnking_params()
+and
+.B hashfile_set_var_chnking_params()
+allow to set the parameters of fixed and variable chunking, respectively.
+.B hashfile_add_file()
+adds a file to the hash file. One should specify file path,
+.I stats
+structure obtained via
+.B stat()
+system call, and the target path in case of a symlink.
+.B hashfile_add_chunk()
+adds a chunk to the current file.
+.B hashfile_reset()
+instructs
+.B libhashfile
+to start iterating over the hash file from the very
+beginning.
+
+.SH RETURN VALUES
+
+For functions that return signed integers, 0 return code indicates success,
+-1 indicates an error. In case of an error,
+.B errno
+value is set appropriately.
+
+Functions returning unsigned integers do not fail.
+
+For functions returning pointers, NULL return value indicates
+an error and the
+.B errno
+is set appropriately.
+
+Two exceptions from the rules:
+
+.B hashfile_next_file()
+returns -1 on error and sets the
+.BR errno ,
+returns 0 if the last file is reached, and
+returns positive value for a successful operation.
+
+.B hashfile_next_chunk()
+returns -1 on error and sets the
+.B errno ,
+returns 0 if the last chunk is reached, and
+returns positive value for a uccessful operation.
+
+.SH AUTHORS
+File systems and Storage Lab (FSL) at Stony Brook University in collaboration
+with Harvey Mudd College (HMC) and Philip Shilane. Vasily Tarasov, Will Buik,
+Geoff Kuenning, Sonam Mandal, Amar Mudrankit, Philip Shilane, Sagar Trehan, and
+Erez Zadok. The package is maintained via
+.B <fsltraces@fsl.cs.sunysb.edu>
+mailing list.
+
+.SH "SEE ALSO"
+.BR fs-hasher (1),
+.BR hf-anonymizer (1),
+.BR hf-simdex (1),
+.BR hf-stat (1)

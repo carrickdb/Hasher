@@ -1,0 +1,281 @@
+.\" Process this file with
+.\" groff -man -Tascii fs-hasher.1
+.\"
+.TH FS-HASHER 1 "February 2014" Linux "User Manuals"
+
+
+.SH NAME
+
+fs-hasher \- file system scanner that chunks files like a deduplication system does.
+
+
+.SH SYNOPSIS
+
+.B fs-hasher
+.RB [ -bdemMq ]
+.B -p
+.I path
+.B -o
+.I hash_file
+.B -c
+.I chunking_method
+.RB [ -C
+.IR chunking_options ]
+.B -h
+.I hashing_method
+.B -z
+.I compression_method
+
+.B fs-hasher
+.RB [ -bdemMq ]
+.B -F 
+.I config_file
+
+.B fs-hasher
+.B -u 
+
+
+.SH DESCRIPTION
+
+.B fs-hasher
+scans a file-system tree located at
+.I path
+and creates its data and metadata snapshot.
+.B Fs-hasher
+does not collect the whole content of every file but instead chunks all
+files using the
+.IR chunking_method ,
+computes the hash of every chunk using the
+.IR hashing_method ,
+and stores hashes in the
+.IR hash_file .
+This is similar to what real-world deduplication systems do.
+.B Fs-hasher
+supports fixed and variable chunking and various hashing methods. The
+information included in the
+.I hash_file
+contains both chunk hashes and rich metadata for every file.
+
+
+.SH OPTIONS
+
+.TP
+.B \-\^b
+Instructs to scan block devices like regular files. Default: skip block devices.
+
+.TP
+.B \-\^c chunking_method
+Determines the chunking method to be used during the scan.
+.I fixed
+and
+.I variable
+are two supported values. For both of the methods additional parameters can
+be specified using
+.B -C
+option.
+
+.TP
+.B -C chunking_options
+Specifies chunking parameters for the selected chunking method.
+.I chunking_options
+is a string containing
+.B option=value
+pairs separated by a colon
+.RB ( : ).
+Valid chunking options are:
+
+.BI csize= chunk_size
+.br
+Chunk size in bytes. This option is only valid for fixed
+chunking.  Its default value is 4096 bytes.
+
+.BI tails=  on | off
+.br
+The right boundary of the last chunk in a file is often dictated by the fact
+that the file ends, but not by the chunking method.  Such chunks are called
+tail chunks. The
+.B tail
+option controls if the hash of a tail chunk is saved to the
+.IR hash_file .
+This option is
+.I on
+by default.
+
+.BI algo= random | simple | rabin
+.br
+This option is only valid for variable chunking method and specifies which
+chunking algorithm to use:
+.IR random ,
+.IR  simple ,
+or
+.IR rabin .
+The
+.I random
+algorithm generates a random value for every
+.I match_bits
+bits of a file.  If the random value's last
+.I match_bits
+bits are equal to the
+.I pattern
+then a chunk boundary is created. The
+.I simple
+algorithm compares every
+.I match_bits 
+bits of a file to the
+.IR pattern .
+If they match, then a chunk boundary is created. Finally,
+.I rabin 
+algorithm uses Rabin fingerprints to determine chunk boundaries. Default is to use
+.I rabin
+algorithm.
+
+
+.BI win_size= window_size
+.br
+Window size in bytes to use in variable chunking with Rabin fingerprints.
+Default value is 48 bytes.
+
+.BI match_bits= number_of_bits
+.br
+Number of bits to use in variable chunking.  Default value is 13 bits
+which corresponds to 2^13=8192 bytes expected chunk size.
+
+.BI pattern= pattern
+.br
+Bit pattern as a hex string to use in variable chunking. Default value is 0x1fff.
+
+.BI min_csize= minimum_chunk_size
+.br
+Minimum chunk size in bytes to use during variable chunking. Default is 2048 bytes.
+
+.BI max_csize= maximum_chunk_size
+.br
+Maximum chunk size in bytes to use during variable chunking. Default is 16384 bytes.
+
+.TP
+.B \-\^d
+Instructs to print debug information.
+
+.TP
+.B \-\^e
+Instructs to exit immediately if open for any file returns ENOENT. Default: continue running.
+
+.TP
+.B \-\^F config_file
+Instructs to read chunking, hashing, and compression parameters from
+.IR config_file .
+Multiple parameter lines can be specified in the
+.IR config_file .
+This allows to scan one file system with different methods in a single run.
+Each line represents a regular
+.B fs-hasher
+command line describing chunking
+.RB ( -c
+and
+.BR -C ),
+hashing
+.RB ( -h ),
+and compression
+.RB ( -z )
+methods. In addition, every line should contain
+.B -o
+option that specifies corresponding output
+.IR hash_file .
+Other global options, such as
+.BR -b ,
+.BR -d ,
+.BR -e ,
+.BR -F ,
+.BR -m ,
+.BR -M ,
+.BR -p ,
+and
+.BR -q ,
+if specified in the
+.IR config_file ,
+are ignored.
+Lines starting with # and empty lines are skipped. 
+
+.TP
+.B \-\^h hashing_method
+Determines which hashing method is used during the scan. Valid values are
+.BR murmur ,
+.BR md5 ,
+.BR md5-64bit ,
+.BR md5-48bit ,
+.BR sha256 .
+Depending on the availability of corresponding libraries at the compilation
+time
+.B fs-hasher
+might not support some of the hashing methods.
+
+.TP
+.B \-\^m
+Instructs not follow any mount points encountered during the tree walk. Default:
+follow all mount points.
+
+.TP
+.B \-\^M
+Instructs to use mmap to read files. Default: use read system call.
+
+.TP
+.B \-\^o hash_file
+Specifies the
+.IR hash_file 
+to put the results in.
+
+.TP
+.B \-\^p path
+Specifies the
+.I path
+of a file system to scan.
+
+.TP
+.B \-\^q
+Instructs not to print progress information.
+
+.TP
+.B \-\^u
+Instructs to print usage message.
+
+.TP
+.B \-\^z  compression_method
+.B Fs-hasher
+computes the compression ratio of every chunk by first compressing the chunk and
+then dividing the size of the compressed chunk by its original size. Currently
+supported compression methods are
+.B none
+(do not compute compression ratio) and
+.B zlib-def
+(zlib compression with default settings).
+
+.SH EXAMPLES
+# fs-hasher\\
+.RS 3
+.br
+-c variable\\
+.br
+-C algo=rabin:min_csize=32768:max_csize=262144:\\
+.br
+.RE
+.RS 6
+win_size=48:match_bits=17:pattern=0xffff:tails=on\\
+.RE
+.RS 3
+.br
+-h md5-48bit -z zlib-def\\
+.br
+-p /directory/to/scan -o /tmp/file.hash
+
+.SH AUTHORS
+File systems and Storage Lab (FSL) at Stony Brook University in collaboration
+with Harvey Mudd College (HMC) and Philip Shilane. Vasily Tarasov, Will Buik,
+Geoff Kuenning, Sonam Mandal, Amar Mudrankit, Philip Shilane, Sagar Trehan, and
+Erez Zadok. The package is maintained via
+.B <fsltraces@fsl.cs.sunysb.edu>
+mailing list.
+
+.SH "SEE ALSO"
+.BR hf-anonymizer (1),
+.BR hf-simdex (1),
+.BR hf-stat (1)

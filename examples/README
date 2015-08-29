@@ -1,0 +1,8 @@
+read_hashfile program in this directory demonstrates how to read hash files
+created using fs-hasher.  You can compile read_hashfile by executing `make` in
+the current directory.  Hash files are read using libhashfile library.  You can
+learn the details of libhashfile API by reading corresponding man-page.
+
+This directory also contains a small example of a hash file -
+coreutils-8.22.hash.  The file was created by running fs-hasher on the
+coreutils-8.22 package source code.

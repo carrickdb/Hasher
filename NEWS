@@ -1,0 +1,17 @@
+* fs-hasher-0.9.3
+
+	- Man pages added
+	- libhashfile is now a real static library
+	- Examples for using libhashfile library added
+	- A lot of cleanup
+
+* fs-hasher-0.9.2
+
+	- Dedup tool and package renamed to 'fs-hasher'
+	- Support of block devices in fs-hasher (-b option)
+	- Simdex tool included in the release
+	- Hash file anonymizer added
+
+* dedup-0.9.1
+
+	- Initial release
